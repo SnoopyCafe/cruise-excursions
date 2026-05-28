@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caribbean Cruise Excursions — Allure of the Seas</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap');
+
+    :root {
+      --ocean-deep: #0a2a4a;
+      --ocean-mid: #1565a0;
+      --ocean-bright: #0ea5e9;
+      --seafoam: #38bdf8;
+      --teal: #0d9488;
+      --sand: #f5e6c8;
+      --sand-dark: #e8c98a;
+      --coral: #f97316;
+      --white: #ffffff;
+      --gold: #d4a74a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: linear-gradient(160deg, #0a2a4a 0%, #1565a0 40%, #0d9488 100%);
+      min-height: 100vh;
+      color: #1e293b;
+    }
+
+    /* ── ANIMATED WAVES ── */
+    .waves-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80'%3E%3Cpath fill='%230ea5e9' fill-opacity='0.25' d='M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,80 L0,80 Z'/%3E%3C/svg%3E") repeat-x bottom;
+      background-size: 50% 100%;
+      animation: wave-anim 8s linear infinite;
+    }
+    .wave:nth-child(2) {
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80'%3E%3Cpath fill='%2338bdf8' fill-opacity='0.18' d='M0,20 C300,70 600,0 900,40 C1200,70 1350,10 1440,30 L1440,80 L0,80 Z'/%3E%3C/svg%3E") repeat-x bottom;
+      background-size: 50% 100%;
+      animation: wave-anim 12s linear infinite reverse;
+    }
+    .wave:nth-child(3) {
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80'%3E%3Cpath fill='%230d9488' fill-opacity='0.15' d='M0,50 C360,10 720,70 1080,30 C1260,10 1380,50 1440,50 L1440,80 L0,80 Z'/%3E%3C/svg%3E") repeat-x bottom;
+      background-size: 50% 100%;
+      animation: wave-anim 16s linear infinite;
+    }
+    @keyframes wave-anim {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      text-align: center;
+      padding: 52px 20px 36px;
+      z-index: 1;
+    }
+    .ship-icon { font-size: 3rem; margin-bottom: 6px; display: block; animation: float 4s ease-in-out infinite; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: var(--white);
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      letter-spacing: 1px;
+    }
+    header p {
+      color: var(--seafoam);
+      font-size: 1rem;
+      margin-top: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ── BUDGET BADGE ── */
+    .budget-strip {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 0 auto 28px;
+      max-width: 780px;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .badge {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(10px);
+      border-radius: 40px;
+      padding: 8px 20px;
+      color: var(--white);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .badge span { color: var(--sand-dark); }
+
+    /* ── TABS ── */
+    .tabs-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 16px 140px;
+    }
+    .tab-nav {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 0;
+      scrollbar-width: none;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 11px 22px;
+      border: none;
+      border-radius: 12px 12px 0 0;
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.25s;
+      border-bottom: 3px solid transparent;
+    }
+    .tab-btn:hover { background: rgba(255,255,255,0.2); color: var(--white); }
+    .tab-btn.active {
+      background: var(--white);
+      color: var(--ocean-deep);
+      border-bottom: 3px solid var(--coral);
+    }
+    .tab-btn .flag { margin-right: 6px; }
+
+    /* ── TAB PANELS ── */
+    .tab-panel {
+      display: none;
+      background: var(--white);
+      border-radius: 0 16px 16px 16px;
+      padding: 32px 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: fadeIn 0.35s ease;
+    }
+    .tab-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── SECTION HEADERS ── */
+    .port-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--sand);
+    }
+    .port-icon {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .port-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--ocean-deep);
+    }
+    .port-header p {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* ── EXCURSION CARDS ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
+
+    .card-badge {
+      padding: 6px 16px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .card-badge.first  { background: var(--ocean-deep); color: var(--gold); }
+    .card-badge.second { background: #475569; color: #cbd5e1; }
+
+    .card-body { padding: 16px; }
+    .card-body h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      color: var(--ocean-deep);
+      margin-bottom: 8px;
+    }
+    .card-body p {
+      font-size: 0.85rem;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .card-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .pill-cost { background: #fef3c7; color: #92400e; }
+    .pill-rating { background: #d1fae5; color: #065f46; }
+
+    /* ── PERSONALITY / VIBE SECTION ── */
+    .vibe-box {
+      background: linear-gradient(135deg, #eff6ff, #ecfdf5);
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-top: 6px;
+      border-left: 4px solid var(--ocean-bright);
+    }
+    .vibe-box h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      color: var(--ocean-deep);
+      margin-bottom: 10px;
+    }
+    .vibe-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .vibe-tag {
+      background: rgba(14,165,233,0.12);
+      color: var(--ocean-mid);
+      border: 1px solid rgba(14,165,233,0.25);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* ── OVERVIEW TAB ── */
+    .overview-intro {
+      font-size: 0.95rem;
+      color: #475569;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+    .overview-intro strong { color: var(--ocean-deep); }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 28px;
+      font-size: 0.88rem;
+    }
+    .summary-table th {
+      background: var(--ocean-deep);
+      color: var(--gold);
+      padding: 12px 14px;
+      text-align: left;
+      letter-spacing: 0.5px;
+    }
+    .summary-table th:first-child { border-radius: 8px 0 0 0; }
+    .summary-table th:last-child  { border-radius: 0 8px 0 0; }
+    .summary-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+      color: #334155;
+    }
+    .summary-table tr:nth-child(even) td { background: #f8fafc; }
+    .summary-table tr:last-child td {
+      background: #fef3c7;
+      font-weight: 900;
+      color: var(--ocean-deep);
+      font-size: 0.95rem;
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .tip-card {
+      background: linear-gradient(135deg, #0a2a4a, #1565a0);
+      border-radius: 12px;
+      padding: 16px 18px;
+      color: var(--white);
+    }
+    .tip-card .tip-icon { font-size: 1.4rem; margin-bottom: 8px; }
+    .tip-card h4 { font-size: 0.85rem; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 6px; color: var(--sand-dark); }
+    .tip-card p  { font-size: 0.8rem; line-height: 1.55; color: rgba(255,255,255,0.82); }
+
+    h3.section-title {
+      font-family: 'Playfair Display', serif;
+      color: var(--ocean-deep);
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .tab-panel { padding: 20px 14px; }
+      .port-header h2 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ANIMATED WAVES -->
+  <div class="waves-container">
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <span class="ship-icon">🚢</span>
+    <h1>Caribbean Cruise Excursions</h1>
+    <p>Allure of the Seas &nbsp;·&nbsp; August 22, 2026</p>
+  </header>
+
+  <!-- BUDGET BADGES -->
+  <div class="budget-strip">
+    <div class="badge">👥 Two Adults</div>
+    <div class="badge">💰 Total Budget <span>$1,000</span></div>
+    <div class="badge">⭐ Recommended Spend <span>~$970</span></div>
+    <div class="badge">🗓️ 4 Ports</div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrapper">
+    <nav class="tab-nav">
+      <button class="tab-btn active" onclick="showTab('overview', this)">🧭 Overview</button>
+      <button class="tab-btn" onclick="showTab('stkitts', this)"><span class="flag">🌿</span>St. Kitts</button>
+      <button class="tab-btn" onclick="showTab('stmaarten', this)"><span class="flag">🏖️</span>St. Maarten</button>
+      <button class="tab-btn" onclick="showTab('sanjuan', this)"><span class="flag">🍹</span>San Juan</button>
+      <button class="tab-btn" onclick="showTab('cococay', this)"><span class="flag">🌴</span>CocoCay</button>
+    </nav>
+
+    <!-- ════════════════ OVERVIEW ════════════════ -->
+    <div id="overview" class="tab-panel active">
+      <div class="port-header">
+        <div class="port-icon" style="background:#eff6ff;">🧭</div>
+        <div>
+          <h2>Your Cruise at a Glance</h2>
+          <p>Curated for mature adults seeking scenery, culture, flavors &amp; relaxation</p>
+        </div>
+      </div>
+
+      <p class="overview-intro">
+        For the <strong>August 22, 2026</strong> sailing on the <strong>Allure of the Seas</strong>,
+        these excursions are optimized for one signature experience per port — giving you a balanced mix of
+        scenic Caribbean beauty, local food &amp; culture, relaxing beach time, and light adventure
+        without exhausting go-go-go pacing. Total recommended spend stays under your <strong>$1,000</strong> budget.
+      </p>
+
+      <h3 class="section-title">💳 Recommended Itinerary Summary</h3>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Port</th>
+            <th>Selected Excursion</th>
+            <th>Est. Cost (2 ppl)</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🌿 St. Kitts</td>
+            <td>Deluxe Catamaran Sail &amp; Snorkel</td>
+            <td>~$240</td>
+            <td>⭐ 4.7/5</td>
+          </tr>
+          <tr>
+            <td>🏖️ St. Maarten</td>
+            <td>Island Highlights + Maho Beach</td>
+            <td>~$180</td>
+            <td>⭐ 4.6–4.8/5</td>
+          </tr>
+          <tr>
+            <td>🍹 San Juan</td>
+            <td>Old San Juan Food &amp; Walking Tour</td>
+            <td>~$330</td>
+            <td>⭐ 4.9/5</td>
+          </tr>
+          <tr>
+            <td>🌴 CocoCay</td>
+            <td>Coco Beach Club Day Pass</td>
+            <td>~$220</td>
+            <td>⭐ Top-Rated</td>
+          </tr>
+          <tr>
+            <td colspan="2">Estimated Total</td>
+            <td colspan="2">~$970 for two</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="section-title">📌 Booking Tips</h3>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <div class="tip-icon">⚡</div>
+          <h4>Book Early</h4>
+          <p>Coco Beach Club and the St. Kitts catamaran often sell out first — book as soon as the Cruise Planner opens.</p>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">💡</div>
+          <h4>Go Independent</h4>
+          <p>The San Juan food tour and St. Maarten island tours can be booked independently for better value with equal quality.</p>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🏷️</div>
+          <h4>Watch for Sales</h4>
+          <p>Royal Caribbean frequently discounts excursions during holiday sales and Cruise Planner promotions.</p>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🎯</div>
+          <h4>Confidence Level</h4>
+          <p>90%+ confidence — based on long-term cruiser reviews, Tripadvisor data, and mature-adult travel preferences.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════ ST. KITTS ════════════════ -->
+    <div id="stkitts" class="tab-panel">
+      <div class="port-header">
+        <div class="port-icon" style="background:#ecfdf5;">🌿</div>
+        <div>
+          <h2>Basseterre, St. Kitts</h2>
+          <p>"Scenic Relaxation" — Turquoise water, coastlines &amp; Caribbean cool</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-badge first">⭐ 1st Choice</div>
+          <div class="card-body">
+            <h3>Deluxe Catamaran Sail &amp; Snorkel</h3>
+            <p>Elegant catamaran sail with snorkeling, open bar, Caribbean music, a beach stop, and lunch. The classic Caribbean experience with a relaxed, mature-adult vibe and stunning coastline scenery.</p>
+            <div class="card-meta">
+              <span class="pill pill-cost">~$240 for 2</span>
+              <span class="pill pill-rating">⭐ 4.7/5 Tripadvisor</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-badge second">2nd Choice</div>
+          <div class="card-body">
+            <h3>St. Kitts Scenic Railway + Island Tour</h3>
+            <p>Historic narrow-gauge railway through rainforest, cliffs, villages, and sugar plantation scenery. Less physical activity, very scenic, and deeply cultural — a unique piece of Caribbean history.</p>
+            <div class="card-meta">
+              <span class="pill pill-cost">~$300 for 2</span>
+              <span class="pill pill-rating">⭐ 4.6/5 Tripadvisor</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vibe-box">
+        <h4>🌊 Port Personality: "Scenic Relaxation"</h4>
+        <div class="vibe-tags">
+          <span class="vibe-tag">Turquoise Water</span>
+          <span class="vibe-tag">Scenic Coastline</span>
+          <span class="vibe-tag">Snorkeling</span>
+          <span class="vibe-tag">Open Bar</span>
+          <span class="vibe-tag">Beach Time</span>
+          <span class="vibe-tag">Caribbean Music</span>
+          <span class="vibe-tag">Relaxed Pace</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════ ST. MAARTEN ════════════════ -->
+    <div id="stmaarten" class="tab-panel">
+      <div class="port-header">
+        <div class="port-icon" style="background:#fff7ed;">🏖️</div>
+        <div>
+          <h2>Philipsburg, St. Maarten</h2>
+          <p>"Best Variety Island" — Dutch &amp; French vibes, beaches &amp; Maho magic</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-badge first">⭐ 1st Choice</div>
+          <div class="card-body">
+            <h3>Island Highlights + Maho Beach + French Side</h3>
+            <p>Combines Dutch/French culture contrast, scenic overlooks, beach time, local rum tasting, and the famous low-flying jets at Maho Beach. Your "see everything" stop in one perfect day.</p>
+            <div class="card-meta">
+              <span class="pill pill-cost">~$180 for 2</span>
+              <span class="pill pill-rating">⭐ 4.6–4.8/5</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-badge second">2nd Choice</div>
+          <div class="card-body">
+            <h3>Golden Eagle Catamaran to Tintamarre</h3>
+            <p>Upscale sailing excursion with snorkeling, a gourmet lunch, open bar, and calmer waters near Tintamarre Island. An excellent luxury beach day if you prefer a more serene escape.</p>
+            <div class="card-meta">
+              <span class="pill pill-cost">~$260 for 2</span>
+              <span class="pill pill-rating">⭐ 4.8/5 Tripadvisor</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vibe-box">
+        <h4>✈️ Port Personality: "Best Variety Island"</h4>
+        <div class="vibe-tags">
+          <span class="vibe-tag">French Cafés</span>
+          <span class="vibe-tag">Beach Bars</span>
+          <span class="vibe-tag">Mountain Overlooks</span>
+          <span class="vibe-tag">Airplane Landings</span>
+          <span class="vibe-tag">Rum Tasting</span>
+          <span class="vibe-tag">Dutch-French Culture</span>
+          <span class="vibe-tag">Caribbean Energy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════ SAN JUAN ════════════════ -->
+    <div id="sanjuan" class="tab-panel">
+      <div class="port-header">
+        <div class="port-icon" style="background:#fdf4ff;">🍹</div>
+        <div>
+          <h2>San Juan, Puerto Rico</h2>
+          <p>"Best Culinary Stop" — Mofongo, rum &amp; colorful colonial history</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-badge first">⭐ 1st Choice</div>
+          <div class="card-body">
+            <h3>Old San Juan Food &amp; Walking Tour</h3>
+            <p>Outstanding culinary and history experience through Old San Juan with mofongo, rum cocktails, local desserts, and historic architecture. Excellent for mature travelers wanting culture + flavors without heavy physical activity.</p>
+            <div class="card-meta">
+              <span class="pill pill-cost">~$330 for 2</span>
+              <span class="pill pill-rating">⭐ 4.9/5</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-badge second">2nd Choice</div>
+          <div class="card-body">
+            <h3>El Yunque Rainforest &amp; Luquillo Beach</h3>
+            <p>Tropical rainforest with waterfalls and a beach stop with local kiosks and authentic Puerto Rican street food. More active, but breathtakingly beautiful. Note: ship departs early afternoon — plan accordingly.</p>
+            <div class="card-meta">
+              <span class="pill pill-cost">~$220 for 2</span>
+              <span class="pill pill-rating">⭐ 4.7/5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vibe-box">
+        <h4>🍽️ Port Personality: "Best Culinary Stop"</h4>
+        <div class="vibe-tags">
+          <span class="vibe-tag">Authentic Mofongo</span>
+          <span class="vibe-tag">Rum Tastings</span>
+          <span class="vibe-tag">Colonial Architecture</span>
+          <span class="vibe-tag">Colorful Streets</span>
+          <span class="vibe-tag">Puerto Rican Culture</span>
+          <span class="vibe-tag">Walkable</span>
+          <span class="vibe-tag">Local Guides</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════ COCOCAY ════════════════ -->
+    <div id="cococay" class="tab-panel">
+      <div class="port-header">
+        <div class="port-icon" style="background:#fffbeb;">🌴</div>
+        <div>
+          <h2>Perfect Day at CocoCay</h2>
+          <p>"Recovery &amp; Luxury" — Infinity pool, premium dining &amp; ocean views</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-badge first">⭐ 1st Choice</div>
+          <div class="card-body">
+            <h3>Coco Beach Club Day Pass</h3>
+            <p>Upscale beach club with a quieter atmosphere, infinity pool, elevated dining, and premium beach loungers. A calmer, more refined vibe than the main island — perfect for the final day before heading home.</p>
+            <div class="card-meta">
+              <span class="pill pill-cost">~$220 for 2</span>
+              <span class="pill pill-rating">⭐ Highly Rated</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-badge second">2nd Choice</div>
+          <div class="card-body">
+            <h3>South Beach Floating Cabana</h3>
+            <p>Private overwater-style floating cabana with personal attendant service and panoramic ocean views. A splurge-worthy, unforgettable relaxation experience — one of CocoCay's most luxurious offerings.</p>
+            <div class="card-meta">
+              <span class="pill pill-cost">~$500–700 for 2</span>
+              <span class="pill pill-rating">⭐ Top Luxury Pick</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vibe-box">
+        <h4>♾️ Port Personality: "Recovery &amp; Luxury"</h4>
+        <div class="vibe-tags">
+          <span class="vibe-tag">Infinity Pool</span>
+          <span class="vibe-tag">Premium Loungers</span>
+          <span class="vibe-tag">Elevated Dining</span>
+          <span class="vibe-tag">Less Crowded</span>
+          <span class="vibe-tag">Attendant Service</span>
+          <span class="vibe-tag">Ocean Views</span>
+          <span class="vibe-tag">Relaxing Atmosphere</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tabs-wrapper -->
+
+  <script>
+    function showTab(id, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>
