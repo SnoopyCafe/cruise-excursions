@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L&P Cruise Excursions — Allure of the Seas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e6f8e 0%, #2b7a99 100%);
+            color: white;
+            padding: 25px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .ship-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 0.9em;
+            letter-spacing: 2px;
+            opacity: 0.95;
+            text-transform: uppercase;
+        }
+
+        .header-pills {
+            display: none;
+        }
+
+        .pill {
+            display: none;
+        }
+
+        .controls {
+            background: white;
+            padding: 30px 40px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-label {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #1f2937;
+            white-space: nowrap;
+        }
+
+        .budget-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .budget-slider-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #1e6f8e;
+            min-width: 80px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #d1d5db;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff9500;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            border: 2px solid white;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff9500;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            border: 2px solid white;
+        }
+
+        .selection-display {
+            background: #f9fafb;
+            padding: 20px 0;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .selection-stat {
+            text-align: center;
+        }
+
+        .selection-label {
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .selection-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1e6f8e;
+        }
+
+        .ports-nav {
+            display: flex;
+            background: #1e6f8e;
+            overflow-x: auto;
+            border-bottom: 3px solid #ff9500;
+        }
+
+        .port-tab {
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .port-tab-name {
+            display: block;
+        }
+
+        .port-tab-time {
+            font-size: 0.75em;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .port-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .port-tab.active {
+            color: white;
+            border-bottom-color: #ff9500;
+            background: rgba(255, 149, 0, 0.1);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .ports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 25px;
+        }
+
+        .port-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .port-card:hover {
+            border-color: #ff9500;
+            box-shadow: 0 4px 16px rgba(30, 111, 142, 0.1);
+        }
+
+        .port-header {
+            background: linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 100%);
+            border-bottom: 2px solid #1e6f8e;
+            padding: 18px;
+        }
+
+        .port-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .port-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .port-activity {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .port-description {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .port-body {
+            padding: 16px;
+        }
+
+        .excursion-item {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            transition: all 0.2s;
+            display: flex;
+            gap: 12px;
+        }
+
+        .excursion-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .excursion-checkbox {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .excursion-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1e6f8e;
+        }
+
+        .excursion-content {
+            flex: 1;
+        }
+
+        .excursion-title {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+
+        .excursion-meta {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 0.85em;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .meta-label {
+            font-size: 0.75em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-value {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .excursion-cost {
+            background: transparent;
+            color: #1f2937;
+            padding: 0;
+            border-radius: 0;
+            font-weight: 600;
+        }
+
+        .cost-label {
+            font-size: 0.75em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .activity-badge {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-weight: 600;
+        }
+
+        .excursion-rating {
+            color: #1e6f8e;
+            font-weight: 600;
+            font-size: 0.85em;
+            padding: 3px 8px;
+            background: #e0f2fe;
+            border-radius: 12px;
+        }
+
+        .excursion-description {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .stats-bar {
+            background: #f9fafb;
+            padding: 25px 40px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #1e6f8e;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 40px;
+            color: #6b7280;
+        }
+
+        .no-results p {
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+
+        .legend {
+            background: #f9fafb;
+            padding: 20px 40px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1f2937;
+            font-size: 0.9em;
+        }
+
+        .legend-items {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65em;
+            flex-shrink: 0;
+        }
+
+        .legend-icon.low {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .legend-icon.moderate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .legend-icon.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sort-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .sort-button {
+            background: #e0f2fe;
+            color: #1e6f8e;
+            border: 1px solid #bae6fd;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .sort-button:hover {
+            background: #bae6fd;
+        }
+
+        .sort-button.active {
+            background: #1e6f8e;
+            color: white;
+            border-color: #1e6f8e;
+        }
+
+        .selected-section {
+            background: #f0f9ff;
+            border: 2px solid #1e6f8e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .selected-header {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #1e6f8e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selected-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .selected-item {
+            background: white;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            border-left: 4px solid #ff9500;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .selected-item-info {
+            flex: 1;
+        }
+
+        .selected-item-name {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .selected-item-port {
+            font-size: 0.75em;
+            color: #999;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .selected-item-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            font-size: 0.8em;
+        }
+
+        .selected-item-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .selected-item-label {
+            font-size: 0.65em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .selected-item-value {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .selected-item-price {
+            display: none;
+        }
+
+        .no-selected {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .legend-inline {
+            background: #f9fafb;
+            padding: 20px 40px;
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        @media (max-width: 768px) {
+            .ports-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .control-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+            }
+
+            .selection-display {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .excursion-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .selected-items {
+                grid-template-columns: 1fr;
+            }
+
+            .port-tab {
+                padding: 10px 15px;
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="ship-icon">🚢</div>
+            <h1>L&P Cruise Excursions</h1>
+            <div class="header-subtitle">Allure of the Seas · August 22, 2026</div>
+
+            <div class="header-pills">
+                <div class="pill">👥 Two Adults</div>
+                <div class="pill">💰 Total Budget <span id="budgetPill">$1,000</span></div>
+                <div class="pill">⭐ Recommended Spend ~$970</div>
+                <div class="pill">🗓️ 4 Ports</div>
+            </div>
+        </div>
+
+
+        <div class="ports-nav" id="portsNav" style="margin-top: 20px;"></div>
+
+        <div class="content" style="padding: 0;">
+            <div class="selected-section" id="selectedSection" style="display: none; margin: 0; padding: 30px 40px; background: white; border-radius: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="selected-header">✓ Your Selected Excursions</div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.9em; color: #666; font-weight: 600;">Selections Total</div>
+                        <div style="font-size: 1.8em; font-weight: 700; color: #1e6f8e;">$<span id="selectedTotalAmount">0</span></div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb;">
+                    <div class="legend-title">Activity Level Guide</div>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-icon low">🧘</div>
+                            <span>Low (2-4): Relaxation, minimal activity</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon moderate">🚶</div>
+                            <span>Moderate (5-6): Walking, light climbing</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon high">⚡</div>
+                            <span>High (7-10): Hiking, adventure, extreme</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="selected-items" id="selectedItems"></div>
+            </div>
+
+        </div>
+
+        <div class="content" style="padding: 30px 40px;">
+
+
+            <div class="ports-grid" id="portsGrid"></div>
+            <div id="noResults" class="no-results" style="display: none;">
+                <p>📍 No excursions match your current budget.</p>
+                <p>Try adjusting the budget slider.</p>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="matchCount">24</div>
+                <div class="stat-label">Excursions Available</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="estimatedCost">$970</div>
+                <div class="stat-label">Recommended Spend</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">4</div>
+                <div class="stat-label">Ports</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const excursionData = {
+            'St. Kitts': {
+                emoji: '🌿',
+                description: 'Scenic Relaxation',
+                activityRange: '2–8',
+                dockedTime: '7:00 am – 1:00 pm',
+                itineDay: 'Day 2',
+                excursions: [
+                    {
+                        name: 'Scenic Railway + Island Tour',
+                        activityLevel: 2,
+                        cost: 300,
+                        rating: 4.6,
+                        description: 'Travel through Caribbean history on a historic narrow-gauge railway built in 1912. Wind through lush rainforest, dramatic cliff edges, colonial sugar plantations, and charming villages. Includes rum punch, local snacks, and expert narration. Perfect for photography and cultural immersion with minimal physical exertion. Duration: 3.5 hours.'
+                    },
+                    {
+                        name: 'Deluxe Catamaran Sail & Snorkel',
+                        activityLevel: 3,
+                        cost: 240,
+                        rating: 4.7,
+                        description: 'Elegant sailing catamaran with max 40 guests creates an intimate, relaxed Caribbean experience. Cruise pristine turquoise waters between St. Kitts and Nevis with live Caribbean music. Snorkel vibrant coral reefs teeming with tropical fish. Includes beach stop at secluded bay, open bar (rum punch, beer, wine), and freshly prepared lunch. Capped at 40 guests for a refined, uncrowded experience. Duration: 4 hours.'
+                    },
+                    {
+                        name: 'Beach & Snorkeling Excursion',
+                        activityLevel: 3,
+                        cost: 180,
+                        rating: 4.5,
+                        description: 'Relax on pristine Frigate Bay Beach with calm, clear waters perfect for light snorkeling. Spot sea turtles, eagle rays, red snapper, and colorful tropical fish in abundance. Lifeguards on duty. Beach bars serve cold beverages. Shade pavilions and lounge chairs available (some with rental fee). No crowds, easy accessibility for all ages and fitness levels. Duration: 5 hours.'
+                    },
+                    {
+                        name: 'Rainforest Hiking Tour',
+                        activityLevel: 5,
+                        cost: 150,
+                        rating: 4.4,
+                        description: 'Guided walk through Central Forest Reserve National Park, home to St. Kitts\' rare Green Vervet Monkeys. Explore over 900 species of tropical plants in pristine rainforest ecosystem. Moderate terrain with some uphill sections. Learn about medicinal plants, bird calls, and ecosystem conservation. Small group size ensures personalized experience. Includes bottled water and tropical fruit snacks. Duration: 2.5 hours.'
+                    },
+                    {
+                        name: 'Mount Liamuiga Volcano Hike',
+                        activityLevel: 8,
+                        cost: 320,
+                        rating: 4.8,
+                        description: 'Challenge yourself on this rewarding hike to St. Kitts\' highest point (3,792 feet) through dense tropical forest. Trail winds past dramatic volcanic formations and crater rim with spectacular island views. Requires good fitness level—steep sections with rope assistance. Bring hiking boots and weather-appropriate clothing. Expert guides provide geological and ecological insights. Includes packed breakfast, water, and energy snacks. Duration: 6-7 hours round trip.'
+                    },
+                    {
+                        name: 'Zip Line Adventure Park',
+                        activityLevel: 7,
+                        cost: 280,
+                        rating: 4.7,
+                        description: 'Experience 5 consecutive zip lines racing over tropical valleys at varying heights. Some lines soar 250+ feet above the rainforest floor—views are spectacular. Professional guides ensure safety with modern harnesses and equipment. Adrenaline rush combined with natural beauty. Suitable for ages 5+. Includes safety briefing, protective gear, and light snacks. Duration: 45 minutes flight time plus safety orientation.'
+                    }
+                ]
+            },
+            'St. Maarten': {
+                emoji: '🏖️',
+                description: 'Best Variety Island',
+                activityRange: '2–9',
+                dockedTime: '1:00 pm – 10:00 pm',
+                itineDay: 'Day 3',
+                excursions: [
+                    {
+                        name: 'Pinel Island Ferry & Snorkel',
+                        activityLevel: 2,
+                        cost: 120,
+                        rating: 4.7,
+                        description: 'Short 10-minute ferry ride to pristine Pinel Island, where calm turquoise waters and white sand beaches create paradise. Snorkel directly from shore in clear waters brimming with tropical fish, rays, and sea turtles. No crowds, minimal development preserves the island\'s tranquility. Beach shack serves fresh seafood and cold drinks. Perfect for photographers and nature lovers. Duration: 4 hours including ferry.'
+                    },
+                    {
+                        name: 'Catamaran to Tintamarre Island',
+                        activityLevel: 3,
+                        cost: 260,
+                        rating: 4.8,
+                        description: 'Upscale catamaran sailing to exclusive Tintamarre Island with max capacity of 30 guests. Gourmet lunch prepared onboard featuring local Caribbean cuisine. Open bar throughout (wine, rum punch, beer). Snorkel pristine reefs in calm, protected waters. Deck lounging with premium cushioned seating. Beach time on secluded white sand. Expert crew provides personalized service. Duration: 5 hours. Ideal for mature travelers seeking refined luxury.'
+                    },
+                    {
+                        name: 'Island Highlights + Maho Beach',
+                        activityLevel: 5,
+                        cost: 180,
+                        rating: 4.7,
+                        description: 'Comprehensive island tour combining Dutch and French colonial charm. Visit Philipsburg\'s colorful main street and local shops. Scenic mountain overlooks with panoramic views. Stop at historic Mullet Bay. Maho Beach experience: famous low-flying jets land just 50 feet overhead—thrilling and unique photo opportunity. Rum tasting at local distillery. Local guide shares cultural and historical insights. Duration: 5 hours.'
+                    },
+                    {
+                        name: 'Grand Island Speedboat & Snorkel',
+                        activityLevel: 5,
+                        cost: 210,
+                        rating: 4.6,
+                        description: 'Exhilarating speedboat tour circumnavigating St. Maarten on a sleek, fast-moving catamaran. Multiple stops for snorkeling at premium reef sites. Swimming encounters with sea turtles (seasonal). Beach break on secluded island. Complimentary snorkel gear and brief orientation. Open bar available. Professional crew shares marine biology insights. Duration: 4 hours. Moderate physical activity due to boat speed and water conditions.'
+                    },
+                    {
+                        name: 'ATV Off-Road Island Tour',
+                        activityLevel: 7,
+                        cost: 200,
+                        rating: 4.5,
+                        description: 'Ride your own ATV through St. Maarten\'s diverse landscape connecting scenic highlights. Route includes Airport Beach where jets depart overhead, coastal Mullet Bay, hidden Baie Rouge, and Friar\'s Bay. Mix of paved roads and light off-road sections—not extreme. Stops for photos and snacks at local eateries. Helmets and safety gear provided. Driver\'s license required. Experience Caribbean island geography and culture. Duration: 3.5 hours.'
+                    },
+                    {
+                        name: 'Flying Dutchman + Zipline Combo',
+                        activityLevel: 9,
+                        cost: 340,
+                        rating: 4.9,
+                        description: 'Ultimate thrill-seeker combo: Traditional schooner cruise onboard the iconic Flying Dutchman followed by the world\'s steepest zipline from St. Maarten\'s highest peak. Schooner sailing features live music, rum punch, and snorkeling. Then transfer to zipline course where you race down from 600+ feet elevation on the steepest descent ever built. Extreme adrenaline. Full safety equipment. Guides are professionals. Not for the faint-hearted. Duration: 5 hours total.'
+                    }
+                ]
+            },
+            'San Juan': {
+                emoji: '🍹',
+                description: 'Best Culinary Stop',
+                activityRange: '2–9',
+                dockedTime: '7:00 am – 3:00 pm',
+                itineDay: 'Day 4',
+                excursions: [
+                    {
+                        name: 'Old San Juan Food & Walking Tour',
+                        activityLevel: 2,
+                        cost: 330,
+                        rating: 4.9,
+                        description: 'Highly-rated culinary walking tour through colorful, historic Old San Juan cobblestone streets. Expert local guide leads tastings at 4-5 stops featuring authentic Puerto Rican cuisine: creamy mofongo at famous restaurant, aged rum cocktails, local pasteles, tropical fruit desserts, and café con leche. Learn history of 500-year-old Spanish colonial architecture while exploring pastel-colored buildings. Leisurely pace with frequent photo stops. Ideal for food lovers and culture enthusiasts. Duration: 3 hours.'
+                    },
+                    {
+                        name: 'Cultural Walking Tour',
+                        activityLevel: 3,
+                        cost: 140,
+                        rating: 4.6,
+                        description: 'Comprehensive walking exploration of Old San Juan\'s cultural heritage with bilingual guide. Visit historic forts, plazas, and churches. Learn stories of Spanish conquest, indigenous Taíno culture, and African heritage woven throughout island. See colorful colonial mansions (some 400+ years old). Browse local art galleries and craft shops. Explore El Morro fortress with Caribbean Sea views. Minimum walking distance but leisurely pace. Great for history buffs. Duration: 2.5 hours.'
+                    },
+                    {
+                        name: 'Bioluminescent Bay Night Tour',
+                        activityLevel: 4,
+                        cost: 280,
+                        rating: 4.8,
+                        description: 'Evening kayaking adventure in one of world\'s brightest bioluminescent bays—a magical natural phenomenon. Paddle through waters glowing brilliant blue as dinoflagellates light up with each paddle stroke. Every movement creates trails of ethereal light. Fully dark evening for maximum glow visibility. Expert guides ensure safety and explain biology. Small group sizes (max 8 kayaks). Photographer\'s dream. No prior kayaking experience needed. Duration: 2 hours including transportation.'
+                    },
+                    {
+                        name: 'El Yunque Rainforest & Waterfalls',
+                        activityLevel: 7,
+                        cost: 220,
+                        rating: 4.7,
+                        description: 'Half-day adventure in Caribbean National Rainforest—only tropical rainforest in US National Forest System. Guided hike on moderate trails featuring multiple waterfall cascades and natural pools for swimming. Terrain is muddy and slippery with river wading, rope-assisted sections, and steep climbs. Lush biodiversity: exotic birds, giant ferns, moss-covered trees. Cool mountain air. Bring hiking boots and waterproof bag. Good fitness level required. Duration: 4 hours including transport from cruise port.'
+                    },
+                    {
+                        name: 'El Yunque Waterslide Adventure',
+                        activityLevel: 9,
+                        cost: 290,
+                        rating: 4.8,
+                        description: 'Extreme adrenaline rainforest experience combining serious hiking with natural waterslide sections and optional cliff jumping. Challenging terrain: scrambling over boulders, wading through rushing river, climbing via rope, navigating slippery rocks. Natural waterslides propel you down smooth rock channels into pools. Expert guides assess safety of each jump opportunity. Incredible biodiversity and waterfalls. Requires above-average fitness and comfort with heights. This is NOT a leisurely hike. Duration: 5 hours. Not recommended for beginners.'
+                    },
+                    {
+                        name: 'Luquillo Beach & Kiosks',
+                        activityLevel: 2,
+                        cost: 95,
+                        rating: 4.5,
+                        description: 'Iconic Caribbean beach experience at Luquillo, famous for palm-fringed crescent bay with calm turquoise waters and powdery white sand. No dangerous undertow—safe for all swimmers. Along the beach, authentic local "kiosks" serve traditional Puerto Rican beach food: alcapurrias (fried plantain), mofongo, fresh ceviche, and ice-cold cerveza. Minimal facilities but authentic local atmosphere. Lifeguards present. Beach chairs and umbrellas available to rent. Picturesque for photography. Duration: 4-5 hours.'
+                    }
+                ]
+            },
+            'CocoCay': {
+                emoji: '🌴',
+                description: 'Recovery & Luxury',
+                activityRange: '2–10',
+                dockedTime: '9:00 am – 5:00 pm',
+                itineDay: 'Day 5',
+                excursions: [
+                    {
+                        name: 'Chill Island Beach',
+                        activityLevel: 2,
+                        cost: 0,
+                        rating: 5.0,
+                        description: 'Royal Caribbean\'s signature complimentary beach area on tranquil Chill Island. Pristine sand, calm turquoise waters perfect for swimming and light snorkeling. Beach sports available: volleyball, paddleboards, kayaks. Shade structures and lounge chairs. Beach bar serves cold beverages. Lifeguards on duty. No crowds compared to main island. Ideal final day for relaxation before heading home. Duration: Full day.'
+                    },
+                    {
+                        name: 'Oasis Lagoon',
+                        activityLevel: 2,
+                        cost: 0,
+                        rating: 5.0,
+                        description: 'FREE crown jewel of CocoCay—largest freshwater pool in Caribbean holds 6.5 million gallons. Crystal-clear water with zero salt. Swim-up bars serving drinks directly poolside. In-water loungers for pure relaxation. Multiple beach access points. Family-friendly with shallow areas and lifeguards. Views of island and ocean beyond. No additional fee to visit. Perfect hybrid: pool comfort with beach scenery. Duration: Full day.'
+                    },
+                    {
+                        name: 'Coco Beach Club Premium',
+                        activityLevel: 3,
+                        cost: 220,
+                        rating: 4.9,
+                        description: 'Adults-only premium upgrade with quieter, more refined atmosphere than main beach. Exclusive infinity pool overlooking ocean—swim borders the horizon. Elevated dining at gourmet beachfront restaurant (Caribbean fusion cuisine). Premium lounge chairs with cushions and shade. Complimentary towel service. Signature cocktails and wine selection. Fewer guests creates peaceful vibe. Ideal for mature travelers seeking sophisticated day. Duration: Full day.'
+                    },
+                    {
+                        name: 'Hideaway Beach (Adults-Only)',
+                        activityLevel: 3,
+                        cost: 180,
+                        rating: 4.8,
+                        description: 'Lively adults-only beach experience with contemporary resort vibe. Live DJ spinning reggae and pop throughout day. Five full-service bars scattered along beach. Elevated dining from casual bites to fine cuisine. Infinity pool with swim-up bar seating. Premium lounge chairs and cabanas. Party atmosphere without being over-the-top. Great for socializing or couples wanting livelier scene. Duration: Full day.'
+                    },
+                    {
+                        name: 'Kayak Adventures',
+                        activityLevel: 5,
+                        cost: 160,
+                        rating: 4.6,
+                        description: 'Guided kayak expedition in 2-person ocean kayaks exploring CocoCay\'s coastal waters and marine ecology. Paddling through shallow turquoise waters reveals starfish, conchs, stingrays, and small tropical fish. Informative guide teaches marine biology and conservation. Snorkeling included at prime reef location. Moderate paddling—not strenuous. All safety gear provided. Beginner-friendly. Photography opportunities abound. Duration: 2 hours.'
+                    },
+                    {
+                        name: 'Zip Line Course',
+                        activityLevel: 8,
+                        cost: 190,
+                        rating: 4.7,
+                        description: 'Thrilling canopy zip line experience with 1,600 feet total length crisscrossing CocoCay island. Multiple platforms connected by lines at varying heights. Stunning aerial views of Thrill Waterpark, white sand beaches, and Caribbean Sea. Professional guides ensure safety with modern harnesses. Adrenaline rush meets natural beauty. Suitable for ages 5+. Physical activity level: moderate. Duration: 1 hour including briefing.'
+                    },
+                    {
+                        name: 'Thrill Waterpark',
+                        activityLevel: 8,
+                        cost: 240,
+                        rating: 4.9,
+                        description: 'Caribbean\'s premier waterpark with 13 unique slides ranging from family-friendly to extreme. Daredevil\'s Peak (tallest waterslide in Caribbean) rockets you down 135 feet. Obstacle course challenge course tests agility in water. Largest wave pool in Caribbean creates authentic surfing conditions. Splash pads for smaller children. Lifeguards everywhere. Multiple bars and food venues. All-day access. High-energy, fun-filled experience. Duration: Full day.'
+                    },
+                    {
+                        name: 'Daredevil\'s Peak + Waterpark',
+                        activityLevel: 10,
+                        cost: 280,
+                        rating: 4.9,
+                        description: 'Extreme waterpark experience featuring world\'s tallest waterslide—Daredevil\'s Peak. This monster 135-foot vertical drop over Caribbean Sea creates maximum adrenaline. Multiple additional extreme slides: RipCurl (360-degree enclosed spiral), Typhoon (speed slide). Wave pool with 6-foot waves. This is NOT leisurely water play. Extreme thrill-seekers only. Requires strong swimming ability and comfort with heights. Duration: Full day access to all facilities.'
+                    },
+                    {
+                        name: 'Helium Balloon Ride',
+                        activityLevel: 3,
+                        cost: 200,
+                        rating: 4.8,
+                        description: 'Unique aerial perspective experience soaring 450 feet above CocoCay in helium-filled observation balloon tethered to ground. Gentle, peaceful ascent without crowds. Panoramic bird\'s-eye views: entire island layout, Allure of the Seas at anchor, surrounding crystal waters. Incredible photography opportunity. No motion sickness—steady hover. Duration: 8-10 minutes flight time. 30 minutes total including ground experience.'
+                    },
+                    {
+                        name: 'South Beach Floating Cabana',
+                        activityLevel: 2,
+                        cost: 600,
+                        rating: 5.0,
+                        description: 'Ultra-premium private overwater cabana experience—true Caribbean luxury. Floating structure placed directly over turquoise waters. Personal attendant anticipates every need. Gourmet catering available. Premium cocktails and wine service. Panoramic ocean views in every direction. Plush furnishings and premium amenities. This is ultimate splurge for special occasions or couples seeking unforgettable romance. Limited availability. Reserve early. Duration: Full day.'
+                    }
+                ]
+            }
+        };
+
+        const portsGrid = document.getElementById('portsGrid');
+        const portsNav = document.getElementById('portsNav');
+        const noResults = document.getElementById('noResults');
+        const matchCount = document.getElementById('matchCount');
+        const selectedSection = document.getElementById('selectedSection');
+        const selectedItemsContainer = document.getElementById('selectedItems');
+
+        let currentSortMode = 'rating';
+        let allExcursions = [];  // Track all excursions with port info
+        let currentSelectedPort = null;
+        let persistentSelectedItems = new Map();  // Track selected items by "port|name" key
+
+        function updateSelectedTotal() {
+            let total = 0;
+            const selectedExcursions = [];
+
+            // Build selected items from persistent Map
+            persistentSelectedItems.forEach((itemData, key) => {
+                total += itemData.cost;
+                selectedExcursions.push({
+                    name: itemData.name,
+                    port: itemData.port,
+                    cost: itemData.cost,
+                    rating: itemData.rating,
+                    activityLevel: itemData.activityLevel
+                });
+            });
+
+            // Update selections total in header
+            const selectedTotalElement = document.getElementById('selectedTotalAmount');
+            if (selectedTotalElement) {
+                selectedTotalElement.textContent = total;
+            }
+
+            // Update selected items display
+            updateSelectedItemsDisplay(selectedExcursions);
+        }
+
+        function updateSelectedItemsDisplay(selectedExcursions) {
+            if (selectedExcursions.length === 0) {
+                selectedSection.style.display = 'none';
+                return;
+            }
+
+            selectedSection.style.display = 'block';
+            selectedItemsContainer.innerHTML = '';
+
+            selectedExcursions.forEach(item => {
+                const excursionEl = document.createElement('div');
+                excursionEl.className = 'selected-item';
+                const costLabel = item.cost === 0 ? 'FREE' : `$${item.cost}`;
+                const ratingDisplay = item.rating ? `⭐ ${item.rating}/5` : 'New';
+                excursionEl.innerHTML = `
+                    <div class="selected-item-info">
+                        <div class="selected-item-name">${item.name}</div>
+                        <div class="selected-item-port">${item.port}</div>
+                        <div class="selected-item-meta">
+                            <div class="selected-item-detail">
+                                <div class="selected-item-label">Price</div>
+                                <div class="selected-item-value">${costLabel}</div>
+                            </div>
+                            <div class="selected-item-detail">
+                                <div class="selected-item-label">Activity</div>
+                                <div class="selected-item-value">Level ${item.activityLevel}</div>
+                            </div>
+                            <div class="selected-item-detail">
+                                <div class="selected-item-label">Rating</div>
+                                <div class="selected-item-value">${ratingDisplay}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="selected-item-price">${costLabel}</div>
+                `;
+                selectedItemsContainer.appendChild(excursionEl);
+            });
+        }
+
+        function renderPorts() {
+            portsGrid.innerHTML = '';
+            let totalExcursions = 0;
+            allExcursions = [];
+
+            // Only render the currently selected port
+            if (!currentSelectedPort) {
+                currentSelectedPort = Object.keys(excursionData)[0];
+            }
+
+            const portName = currentSelectedPort;
+            const portData = excursionData[portName];
+
+            if (portData) {
+                let filteredExcursions = portData.excursions.slice();
+
+                // Apply sorting
+                if (currentSortMode === 'rating') {
+                    filteredExcursions = [...filteredExcursions].sort((a, b) => b.rating - a.rating);
+                } else if (currentSortMode === 'activity') {
+                    filteredExcursions = [...filteredExcursions].sort((a, b) => a.activityLevel - b.activityLevel);
+                }
+
+                const portCard = document.createElement('div');
+                portCard.className = 'port-card';
+
+                let excursionsHTML = '';
+
+                filteredExcursions.forEach(exc => {
+                    const ratingDisplay = exc.rating ? `⭐ ${exc.rating}/5` : 'New';
+                    const costLabel = exc.cost === 0 ? 'FREE' : `$${exc.cost}`;
+                    const activityLabel = `Level ${exc.activityLevel}`;
+                    const itemKey = `${portName}|${exc.name}`;
+                    const isSelected = persistentSelectedItems.has(itemKey);
+
+                    allExcursions.push({
+                        port: portName,
+                        name: exc.name,
+                        cost: exc.cost,
+                        rating: exc.rating,
+                        activityLevel: exc.activityLevel
+                    });
+
+                    excursionsHTML += `
+                        <div class="excursion-item">
+                            <div class="excursion-checkbox">
+                                <input type="checkbox" ${isSelected ? 'checked' : ''} data-cost="${exc.cost}" data-name="${exc.name}" data-port="${portName}" data-rating="${exc.rating}" data-activity="${exc.activityLevel}" class="exc-checkbox">
+                            </div>
+                            <div class="excursion-content">
+                                <div class="excursion-title">${exc.name}</div>
+                                <div class="excursion-meta">
+                                    <div class="meta-item">
+                                        <div class="cost-label">Price (2 ppl)</div>
+                                        <div class="meta-value">${costLabel}</div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-label">Activity</div>
+                                        <div class="activity-badge">${activityLabel}</div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-label">Rating</div>
+                                        <div class="excursion-rating">${ratingDisplay}</div>
+                                    </div>
+                                </div>
+                                <div class="excursion-description">${exc.description}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    totalExcursions++;
+                });
+
+                portCard.innerHTML = `
+                    <div class="port-header">
+                        <div class="port-header-top">
+                            <div class="port-name">${portData.emoji} ${portName}</div>
+                            <div class="port-activity">Activity ${portData.activityRange}</div>
+                        </div>
+                        <div class="port-description">${portData.description}</div>
+                    </div>
+                    <div style="padding: 20px 20px 0; border-bottom: 1px solid #e5e7eb;">
+                        <div class="sort-controls">
+                            <span class="sort-label">Sort by:</span>
+                            <button class="sort-button ${currentSortMode === 'rating' ? 'active' : ''}" data-sort="rating">Highest Rating</button>
+                            <button class="sort-button ${currentSortMode === 'activity' ? 'active' : ''}" data-sort="activity">Activity Level</button>
+                        </div>
+                    </div>
+                    <div class="port-body">
+                        ${excursionsHTML}
+                    </div>
+                `;
+
+                portsGrid.appendChild(portCard);
+            }
+
+            matchCount.textContent = totalExcursions;
+
+            if (totalExcursions === 0) {
+                noResults.style.display = 'block';
+                portsGrid.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                portsGrid.style.display = 'grid';
+            }
+
+            document.querySelectorAll('.exc-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const itemKey = `${e.target.dataset.port}|${e.target.dataset.name}`;
+
+                    if (e.target.checked) {
+                        // Add to selected items
+                        persistentSelectedItems.set(itemKey, {
+                            name: e.target.dataset.name,
+                            port: e.target.dataset.port,
+                            cost: parseInt(e.target.dataset.cost),
+                            rating: parseFloat(e.target.dataset.rating),
+                            activityLevel: parseInt(e.target.dataset.activity)
+                        });
+                    } else {
+                        // Remove from selected items
+                        persistentSelectedItems.delete(itemKey);
+                    }
+
+                    updateSelectedTotal();
+                });
+            });
+
+            // Attach sort button listeners for port-specific sort controls
+            document.querySelectorAll('.sort-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.sort-button').forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                    currentSortMode = button.dataset.sort;
+                    renderPorts();
+                });
+            });
+
+            updateSelectedTotal();
+        }
+
+        function renderPortNav() {
+            portsNav.innerHTML = '';
+            for (const portName of Object.keys(excursionData)) {
+                const tab = document.createElement('div');
+                tab.className = 'port-tab';
+                const portData = excursionData[portName];
+                tab.innerHTML = `
+                    <span class="port-tab-name">${portData.emoji} ${portName} (${portData.itineDay})</span>
+                    <span class="port-tab-time">${portData.dockedTime}</span>
+                `;
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.port-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentSelectedPort = portName;
+                    renderPorts();
+                });
+                portsNav.appendChild(tab);
+            }
+            if (portsNav.firstChild) {
+                portsNav.firstChild.classList.add('active');
+                currentSelectedPort = Object.keys(excursionData)[0];
+            }
+        }
+
+        renderPortNav();
+        renderPorts();
+    </script>
+</body>
+</html>
