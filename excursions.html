@@ -270,6 +270,115 @@
             padding: 16px;
         }
 
+        .excursion-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .excursion-comparison:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .excursion-option {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px;
+            position: relative;
+        }
+
+        .excursion-option.ship {
+            border-left: 4px solid #1e6f8e;
+        }
+
+        .excursion-option.local {
+            border-left: 4px solid #10b981;
+        }
+
+        .option-badge {
+            display: inline-block;
+            font-size: 0.7em;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .option-badge.ship {
+            background: #e0f2fe;
+            color: #1e6f8e;
+        }
+
+        .option-badge.local {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .savings-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .excursion-option-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .excursion-option-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.8em;
+            margin-bottom: 8px;
+        }
+
+        .option-price {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #1e6f8e;
+        }
+
+        .option-rating {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .excursion-option-description {
+            font-size: 0.8em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .option-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.75em;
+            color: #1e6f8e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .option-link:hover {
+            text-decoration: underline;
+        }
+
         .excursion-item {
             margin-bottom: 16px;
             padding-bottom: 16px;
@@ -742,14 +851,32 @@
                         activityLevel: 2,
                         cost: 300,
                         rating: 4.6,
-                        description: 'Travel through Caribbean history on a historic narrow-gauge railway built in 1912. Wind through lush rainforest, dramatic cliff edges, colonial sugar plantations, and charming villages. Includes rum punch, local snacks, and expert narration. Perfect for photography and cultural immersion with minimal physical exertion. Duration: 3.5 hours.'
+                        description: 'Travel through Caribbean history on a historic narrow-gauge railway built in 1912. Wind through lush rainforest, dramatic cliff edges, colonial sugar plantations, and charming villages. Includes rum punch, local snacks, and expert narration. Perfect for photography and cultural immersion with minimal physical exertion. Duration: 3.5 hours.',
+                        localAlternative: {
+                            name: 'St. Kitts Scenic Railway (book direct)',
+                            cost: 179,
+                            costPerPerson: 89.50,
+                            rating: 4.5,
+                            description: 'Identical train the cruise line resells. 30-mi narrow-gauge loop, open-air deck, drinks, coach return. ~$89-91.50 pp.',
+                            savings: 121,
+                            link: 'https://www.viator.com/tours/St-Kitts/St-Kitts-Scenic-Railway-Tour/d930-5226RAIL'
+                        }
                     },
                     {
                         name: 'Deluxe Catamaran Sail & Snorkel',
                         activityLevel: 3,
                         cost: 240,
                         rating: 4.7,
-                        description: 'Elegant sailing catamaran with max 40 guests creates an intimate, relaxed Caribbean experience. Cruise pristine turquoise waters between St. Kitts and Nevis with live Caribbean music. Snorkel vibrant coral reefs teeming with tropical fish. Includes beach stop at secluded bay, open bar (rum punch, beer, wine), and freshly prepared lunch. Capped at 40 guests for a refined, uncrowded experience. Duration: 4 hours.'
+                        description: 'Elegant sailing catamaran with max 40 guests creates an intimate, relaxed Caribbean experience. Cruise pristine turquoise waters between St. Kitts and Nevis with live Caribbean music. Snorkel vibrant coral reefs teeming with tropical fish. Includes beach stop at secluded bay, open bar (rum punch, beer, wine), and freshly prepared lunch. Capped at 40 guests for a refined, uncrowded experience. Duration: 4 hours.',
+                        localAlternative: {
+                            name: 'Blue Water Safaris',
+                            cost: 99,
+                            costPerPerson: 49.50,
+                            rating: 4.9,
+                            description: "Island's leading charter (est. 1996). Half-day snorkel ~$49.50-79; full-day Nevis $99 w/ open bar + lunch. Direct booking saves $50-100/pp.",
+                            savings: 141,
+                            link: 'https://bluewatersafaris.com/'
+                        }
                     },
                     {
                         name: 'Beach & Snorkeling Excursion',
@@ -1084,28 +1211,48 @@
                         activityLevel: exc.activityLevel
                     });
 
+                    // Build ship option
+                    let comparisonHTML = `
+                        <div class="excursion-comparison">
+                            <div class="excursion-option ship">
+                                <div class="option-badge ship">⛴️ Ship Excursion</div>
+                                <div class="excursion-option-title">${exc.name}</div>
+                                <div class="excursion-option-meta">
+                                    <div class="option-price">$${exc.cost}</div>
+                                    <div class="option-rating">${ratingDisplay}</div>
+                                </div>
+                                <div class="excursion-option-description">${exc.description}</div>
+                            </div>`;
+
+                    // Add local alternative if exists
+                    if (exc.localAlternative) {
+                        const localRating = exc.localAlternative.rating ? `⭐ ${exc.localAlternative.rating}/5` : 'New';
+                        comparisonHTML += `
+                            <div class="excursion-option local">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="option-badge local">🏝️ Local Alternative</div>
+                                    <span class="savings-badge">Save $${exc.localAlternative.savings}</span>
+                                </div>
+                                <div class="excursion-option-title">${exc.localAlternative.name}</div>
+                                <div class="excursion-option-meta">
+                                    <div class="option-price">$${exc.localAlternative.cost}</div>
+                                    <div class="option-rating">${localRating}</div>
+                                </div>
+                                <div class="excursion-option-description">${exc.localAlternative.description}</div>
+                                ${exc.localAlternative.link ? `<a href="${exc.localAlternative.link}" target="_blank" class="option-link">Book Direct →</a>` : ''}
+                            </div>
+                        `;
+                    }
+
+                    comparisonHTML += `</div>`;
+
                     excursionsHTML += `
                         <div class="excursion-item">
                             <div class="excursion-checkbox">
                                 <input type="checkbox" ${isSelected ? 'checked' : ''} data-cost="${exc.cost}" data-name="${exc.name}" data-port="${portName}" data-rating="${exc.rating}" data-activity="${exc.activityLevel}" class="exc-checkbox">
                             </div>
                             <div class="excursion-content">
-                                <div class="excursion-title">${exc.name}</div>
-                                <div class="excursion-meta">
-                                    <div class="meta-item">
-                                        <div class="cost-label">Price (2 ppl)</div>
-                                        <div class="meta-value">${costLabel}</div>
-                                    </div>
-                                    <div class="meta-item">
-                                        <div class="meta-label">Activity</div>
-                                        <div class="activity-badge">${activityLabel}</div>
-                                    </div>
-                                    <div class="meta-item">
-                                        <div class="meta-label">Rating</div>
-                                        <div class="excursion-rating">${ratingDisplay}</div>
-                                    </div>
-                                </div>
-                                <div class="excursion-description">${exc.description}</div>
+                                ${comparisonHTML}
                             </div>
                         </div>
                     `;
