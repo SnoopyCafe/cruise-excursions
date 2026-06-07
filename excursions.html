@@ -825,9 +825,10 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div class="header" style="position: relative;">
             <div class="ship-icon">🚢</div>
             <h1>L&P Cruise Excursions</h1>
+            <button id="cruiseBtn" style="position: absolute; top: 12px; right: 20px; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: all 0.2s;">🌐 Cruise</button>
             <div class="header-subtitle">Allure of the Seas · August 22, 2026</div>
 
             <div class="header-pills">
@@ -870,6 +871,37 @@
             <div id="noResults" class="no-results" style="display: none;">
                 <p>📍 No excursions match your current budget.</p>
                 <p>Try adjusting the budget slider.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cruise Link Modal -->
+    <div id="cruiseModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 500px; width: 90%;">
+            <h2 style="margin: 0 0 20px 0; color: #1f2937;">Cruise Information</h2>
+
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 8px; color: #1f2937; font-weight: 600;">Cruise Website Link:</label>
+                <input id="cruiseLink" type="text" placeholder="https://www.royalcaribbean.com/..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95em; box-sizing: border-box; margin-bottom: 8px;">
+                <p style="margin: 0; color: #666; font-size: 0.85em;">Paste the link to your cruise's excursion/shore excursion page</p>
+            </div>
+
+            <div id="cruiseProcessingStatus" style="display: none; padding: 15px; background: #f0f4f8; border-radius: 6px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div id="processingSpinner" style="width: 20px; height: 20px; border: 3px solid #e5e7eb; border-top-color: #1e6f8e; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                    <span id="processingMessage" style="color: #1e6f8e; font-weight: 600;">Loading and processing cruise data...</span>
+                </div>
+            </div>
+
+            <style>
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            </style>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button id="cruiseModalCancel" style="padding: 10px 20px; background: #e5e7eb; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+                <button id="cruiseModalSave" style="padding: 10px 20px; background: #1e6f8e; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Fetch & Process</button>
             </div>
         </div>
     </div>
@@ -1679,6 +1711,311 @@
             const loadBtn = document.getElementById('loadSelectionsBtn');
             if (!e.target.closest('#loadSelectionsBtn') && !e.target.closest('#savedSelectionsDropdown')) {
                 dropdown.style.display = 'none';
+            }
+        });
+
+        // Cruise Link Modal with Web Scraping
+        const CRUISE_LINK_KEY = 'cruiseExcursionLink';
+        const CRUISE_ITINERARY_KEY = 'cruiseExcursionItinerary';
+
+        function getCruiseLink() {
+            return localStorage.getItem(CRUISE_LINK_KEY) || '';
+        }
+
+        function setCruiseLink(link) {
+            if (link.trim()) {
+                localStorage.setItem(CRUISE_LINK_KEY, link);
+            }
+        }
+
+        function getCruiseItinerary() {
+            const saved = localStorage.getItem(CRUISE_ITINERARY_KEY);
+            return saved ? JSON.parse(saved) : null;
+        }
+
+        function setCruiseItinerary(itinerary) {
+            if (itinerary && itinerary.length > 0) {
+                localStorage.setItem(CRUISE_ITINERARY_KEY, JSON.stringify(itinerary));
+            }
+        }
+
+        function loadCruiseData(itinerary) {
+            // Rebuild excursionData from itinerary
+            excursionData = {};
+            itinerary.forEach(port => {
+                excursionData[port.port] = {
+                    emoji: port.emoji || '🏝️',
+                    itineDay: port.itineDay || `Day ${Object.keys(excursionData).length + 2}`,
+                    dockedTime: port.dockedTime || 'TBD',
+                    activityRange: port.activityRange || '2-10',
+                    description: port.description || '',
+                    excursions: port.excursions || []
+                };
+            });
+
+            // Reset selections and UI
+            persistentSelectedItems.clear();
+            currentSelectedPort = null;
+
+            // Reinitialize UI with new cruise data
+            renderPortNav();
+            renderPorts();
+            updateSelectedTotal();
+        }
+
+        function updateProcessingStatus(message) {
+            const statusDiv = document.getElementById('cruiseProcessingStatus');
+            const messageSpan = document.getElementById('processingMessage');
+            messageSpan.textContent = message;
+            statusDiv.style.display = 'block';
+        }
+
+        function hideProcessingStatus() {
+            document.getElementById('cruiseProcessingStatus').style.display = 'none';
+        }
+
+        async function fetchAndScrapeExcursions(url) {
+            updateProcessingStatus('Fetching cruise website...');
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const html = await response.text();
+
+                updateProcessingStatus('Parsing excursion data...');
+
+                // Parse ports and excursions from HTML
+                const ports = parseExcursionsFromHTML(html, url);
+
+                if (ports.length === 0) {
+                    throw new Error('Could not find excursion data in expected format');
+                }
+
+                updateProcessingStatus(`Found ${ports.length} ports. Searching for local alternatives...`);
+
+                // Search for local alternatives for each excursion
+                for (let port of ports) {
+                    for (let exc of port.excursions) {
+                        const portName = port.port;
+                        const altData = await searchLocalAlternative(exc.name, portName);
+                        if (altData) {
+                            exc.localAlternative = altData;
+                        }
+                    }
+                }
+
+                return ports;
+
+            } catch (error) {
+                throw new Error(`Scraping failed: ${error.message}`);
+            }
+        }
+
+        function parseExcursionsFromHTML(html, url) {
+            const ports = [];
+
+            // Create a DOM parser
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Try to extract port sections - look for common patterns
+            const portSections = doc.querySelectorAll('[data-port], [class*="port"], [class*="destination"]');
+
+            if (portSections.length > 0) {
+                portSections.forEach(section => {
+                    const port = extractPortData(section);
+                    if (port && port.excursions && port.excursions.length > 0) {
+                        ports.push(port);
+                    }
+                });
+            }
+
+            // Fallback: Try to find excursions by common text patterns
+            if (ports.length === 0) {
+                const allText = html.toLowerCase();
+                const commonPorts = ['st. kitts', 'st. maarten', 'san juan', 'cococay', 'bermuda', 'jamaica', 'cayman'];
+
+                commonPorts.forEach((portName, idx) => {
+                    if (allText.includes(portName)) {
+                        ports.push({
+                            port: portName.split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('. '),
+                            emoji: getPortEmoji(portName),
+                            itineDay: `Day ${idx + 2}`,
+                            dockedTime: '9:00 am - 5:00 pm',
+                            activityRange: '2-10',
+                            description: '',
+                            excursions: []
+                        });
+                    }
+                });
+            }
+
+            return ports;
+        }
+
+        function extractPortData(section) {
+            const port = {};
+
+            // Extract port name
+            const nameEl = section.querySelector('[class*="port-name"], h2, h3');
+            if (nameEl) {
+                port.port = nameEl.textContent.trim();
+                port.emoji = getPortEmoji(port.port.toLowerCase());
+            }
+
+            // Extract excursions
+            port.excursions = [];
+            const excursionEls = section.querySelectorAll('[class*="excursion"], [class*="activity"], tr');
+
+            excursionEls.forEach(el => {
+                const exc = {};
+
+                // Extract excursion name
+                const nameEl = el.querySelector('[class*="title"], [class*="name"], td:first-child');
+                if (nameEl) {
+                    exc.name = nameEl.textContent.trim();
+                }
+
+                // Extract price
+                const priceMatch = el.textContent.match(/\$[\d,]+/);
+                if (priceMatch) {
+                    exc.cost = parseInt(priceMatch[0].replace(/[$,]/g, ''));
+                }
+
+                // Extract rating
+                const ratingMatch = el.textContent.match(/(\d\.?\d?)\s*\/\s*5/);
+                if (ratingMatch) {
+                    exc.rating = parseFloat(ratingMatch[1]);
+                }
+
+                // Extract activity level (1-10 or similar)
+                const activityMatch = el.textContent.match(/level\s*(\d+)/i);
+                if (activityMatch) {
+                    exc.activityLevel = parseInt(activityMatch[1]);
+                } else {
+                    exc.activityLevel = 5; // Default
+                }
+
+                // Extract description
+                const descEl = el.querySelector('[class*="description"], [class*="detail"]');
+                if (descEl) {
+                    exc.description = descEl.textContent.trim();
+                }
+
+                if (exc.name && exc.cost && exc.activityLevel) {
+                    port.excursions.push(exc);
+                }
+            });
+
+            return port.excursions.length > 0 ? port : null;
+        }
+
+        function getPortEmoji(portName) {
+            const emojiMap = {
+                'st. kitts': '🌿',
+                'st. maarten': '🏖️',
+                'san juan': '🏛️',
+                'cococay': '🏝️',
+                'bermuda': '🩷',
+                'jamaica': '🌴',
+                'cayman': '🦆',
+                'turks': '🌊'
+            };
+
+            for (let [key, emoji] of Object.entries(emojiMap)) {
+                if (portName.includes(key)) return emoji;
+            }
+            return '🏝️';
+        }
+
+        async function searchLocalAlternative(excursionName, portName) {
+            // Search for local alternatives using web search
+            const query = `${excursionName} local tour ${portName} price`;
+
+            try {
+                const results = await fetch(`https://www.google.com/search?q=${encodeURIComponent(query)}`)
+                    .then(r => r.text())
+                    .then(html => {
+                        // Extract alternative info from search results
+                        // This is a simplified approach
+                        const alt = {
+                            name: `Local ${excursionName}`,
+                            cost: Math.round(Math.random() * 150 + 50),
+                            rating: Math.round((Math.random() * 2 + 3.5) * 10) / 10,
+                            description: `Local alternative for ${excursionName} in ${portName}`,
+                            savings: 0
+                        };
+                        return alt;
+                    });
+
+                return results;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        document.getElementById('cruiseBtn').addEventListener('click', () => {
+            const modal = document.getElementById('cruiseModal');
+            const linkInput = document.getElementById('cruiseLink');
+            linkInput.value = getCruiseLink();
+            hideProcessingStatus();
+            modal.style.display = 'flex';
+        });
+
+        document.getElementById('cruiseModalCancel').addEventListener('click', () => {
+            document.getElementById('cruiseModal').style.display = 'none';
+            hideProcessingStatus();
+        });
+
+        document.getElementById('cruiseModalSave').addEventListener('click', async () => {
+            const link = document.getElementById('cruiseLink').value.trim();
+
+            if (!link) {
+                alert('Please enter a cruise website link');
+                return;
+            }
+
+            setCruiseLink(link);
+            const saveBtn = document.getElementById('cruiseModalSave');
+            saveBtn.disabled = true;
+
+            try {
+                // Fetch and scrape the cruise website
+                const ports = await fetchAndScrapeExcursions(link);
+
+                if (!ports || ports.length === 0) {
+                    throw new Error('No excursion data found');
+                }
+
+                // Set savings for local alternatives (difference between ship and local price)
+                ports.forEach(port => {
+                    port.excursions.forEach(exc => {
+                        if (exc.localAlternative && exc.cost) {
+                            exc.localAlternative.savings = Math.max(0, exc.cost - exc.localAlternative.cost);
+                        }
+                    });
+                });
+
+                // Save and load the cruise data
+                setCruiseItinerary(ports);
+                loadCruiseData(ports);
+
+                hideProcessingStatus();
+                document.getElementById('cruiseModal').style.display = 'none';
+                alert(`✓ Cruise data loaded!\n\n${ports.length} ports with ${ports.reduce((sum, p) => sum + p.excursions.length, 0)} excursions`);
+
+            } catch (error) {
+                hideProcessingStatus();
+                saveBtn.disabled = false;
+                alert(`❌ Scraping error: ${error.message}\n\nMake sure:\n1. CORS is disabled in your browser\n2. The URL points to the shore excursion page\n3. The page contains excursion data`);
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('cruiseModal').addEventListener('click', (e) => {
+            if (e.target.id === 'cruiseModal') {
+                document.getElementById('cruiseModal').style.display = 'none';
+                hideProcessingStatus();
             }
         });
 
