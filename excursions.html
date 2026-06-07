@@ -28,25 +28,25 @@
         .header {
             background: linear-gradient(135deg, #1e6f8e 0%, #2b7a99 100%);
             color: white;
-            padding: 25px 40px;
+            padding: 12px 20px;
             text-align: center;
             position: relative;
         }
 
         .ship-icon {
-            font-size: 2em;
-            margin-bottom: 8px;
+            font-size: 1em;
+            margin-bottom: 4px;
         }
 
         .header h1 {
-            font-size: 2em;
+            font-size: 1em;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             letter-spacing: -0.5px;
         }
 
         .header-subtitle {
-            font-size: 0.9em;
+            font-size: 0.65em;
             letter-spacing: 2px;
             opacity: 0.95;
             text-transform: uppercase;
@@ -217,6 +217,27 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
             gap: 25px;
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .ports-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .ports-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .ports-grid::-webkit-scrollbar-thumb {
+            background: #1e6f8e;
+            border-radius: 10px;
+        }
+
+        .ports-grid::-webkit-scrollbar-thumb:hover {
+            background: #15516b;
         }
 
         .port-card {
@@ -623,6 +644,11 @@
             z-index: 100;
             max-height: 80vh;
             overflow-y: auto;
+            display: block;
+        }
+
+        .selected-section.hidden {
+            display: none !important;
         }
 
         .selected-header {
@@ -780,35 +806,15 @@
 
         <div class="ports-nav" id="portsNav" style="margin-top: 20px;"></div>
 
-        <div class="content" style="padding: 0;">
-            <div class="selected-section" id="selectedSection" style="display: none; margin: 0; padding: 30px 40px; background: white; border-radius: 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div class="selected-header">✓ Your Selected Excursions</div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 0.9em; color: #666; font-weight: 600;">Selections Total</div>
-                        <div style="font-size: 1.8em; font-weight: 700; color: #1e6f8e;">$<span id="selectedTotalAmount">0</span></div>
-                    </div>
+        <div class="selected-section" id="selectedSection" style="margin: 0; padding: 30px 40px; background: #f0f9ff; border-radius: 0; border: 2px solid #1e6f8e;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="selected-header">✓ Your Selected Excursions</div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.9em; color: #666; font-weight: 600;">Selections Total</div>
+                    <div style="font-size: 1.8em; font-weight: 700; color: #1e6f8e;">$<span id="selectedTotalAmount">0</span></div>
                 </div>
-                <div style="margin-top: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb;">
-                    <div class="legend-title">Activity Level Guide</div>
-                    <div class="legend-items">
-                        <div class="legend-item">
-                            <div class="legend-icon low">🧘</div>
-                            <span>Low (2-4): Relaxation, minimal activity</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-icon moderate">🚶</div>
-                            <span>Moderate (5-6): Walking, light climbing</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-icon high">⚡</div>
-                            <span>High (7-10): Hiking, adventure, extreme</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="selected-items" id="selectedItems"></div>
             </div>
-
+            <div class="selected-items" id="selectedItems"></div>
         </div>
 
         <div class="content" style="padding: 30px 40px;">
@@ -818,21 +824,6 @@
             <div id="noResults" class="no-results" style="display: none;">
                 <p>📍 No excursions match your current budget.</p>
                 <p>Try adjusting the budget slider.</p>
-            </div>
-        </div>
-
-        <div class="stats-bar">
-            <div class="stat">
-                <div class="stat-value" id="matchCount">24</div>
-                <div class="stat-label">Excursions Available</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="estimatedCost">$970</div>
-                <div class="stat-label">Recommended Spend</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">4</div>
-                <div class="stat-label">Ports</div>
             </div>
         </div>
     </div>
@@ -1230,13 +1221,12 @@
         }
 
         function updateSelectedItemsDisplay(selectedExcursions) {
+            selectedItemsContainer.innerHTML = '';
+
             if (selectedExcursions.length === 0) {
-                selectedSection.style.display = 'none';
+                selectedItemsContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #999; font-size: 0.9em;">No excursions selected yet</div>';
                 return;
             }
-
-            selectedSection.style.display = 'block';
-            selectedItemsContainer.innerHTML = '';
 
             selectedExcursions.forEach(item => {
                 const excursionEl = document.createElement('div');
@@ -1337,7 +1327,7 @@
 
                     // Add local alternative if exists
                     if (exc.localAlternative) {
-                        const localItemKey = `${portName}|${exc.name}|local`;
+                        const localItemKey = `${portName}|${exc.localAlternative.name}|local`;
                         const localIsSelected = persistentSelectedItems.has(localItemKey);
                         const localRating = exc.localAlternative.rating ? `⭐ ${exc.localAlternative.rating}/5` : 'New';
                         comparisonHTML += `
@@ -1405,40 +1395,40 @@
             }
 
             document.querySelectorAll('.option-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', (e) => {
-                    const itemKey = `${e.target.dataset.port}|${e.target.dataset.name}|${e.target.dataset.type}`;
-
-                    if (e.target.checked) {
-                        // Add to selected items
-                        persistentSelectedItems.set(itemKey, {
-                            name: e.target.dataset.name,
-                            port: e.target.dataset.port,
-                            cost: parseInt(e.target.dataset.cost),
-                            rating: parseFloat(e.target.dataset.rating),
-                            activityLevel: parseInt(e.target.dataset.activity),
-                            type: e.target.dataset.type
-                        });
-                    } else {
-                        // Remove from selected items
-                        persistentSelectedItems.delete(itemKey);
-                    }
-
-                    updateSelectedTotal();
-                });
+                checkbox.addEventListener('change', handleCheckboxChange);
+                checkbox.addEventListener('click', handleCheckboxChange);
             });
+        }
 
-            // Attach sort button listeners for port-specific sort controls
-            document.querySelectorAll('.sort-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    document.querySelectorAll('.sort-button').forEach(b => b.classList.remove('active'));
-                    button.classList.add('active');
-                    currentSortMode = button.dataset.sort;
-                    renderPorts();
+        function handleCheckboxChange(e) {
+            if (!e.target.classList.contains('option-checkbox')) return;
+
+            const itemKey = `${e.target.dataset.port}|${e.target.dataset.name}|${e.target.dataset.type}`;
+
+            if (e.target.checked) {
+                // Add to selected items
+                persistentSelectedItems.set(itemKey, {
+                    name: e.target.dataset.name,
+                    port: e.target.dataset.port,
+                    cost: parseInt(e.target.dataset.cost),
+                    rating: parseFloat(e.target.dataset.rating),
+                    activityLevel: parseInt(e.target.dataset.activity),
+                    type: e.target.dataset.type
                 });
-            });
+            } else {
+                // Remove from selected items
+                persistentSelectedItems.delete(itemKey);
+            }
 
             updateSelectedTotal();
         }
+
+        // Use event delegation for checkboxes that might be added dynamically
+        document.addEventListener('change', function(e) {
+            if (e.target.classList && e.target.classList.contains('option-checkbox')) {
+                handleCheckboxChange(e);
+            }
+        });
 
         function renderPortNav() {
             portsNav.innerHTML = '';
@@ -1466,6 +1456,7 @@
 
         renderPortNav();
         renderPorts();
+        updateSelectedTotal();
     </script>
 </body>
 </html>
