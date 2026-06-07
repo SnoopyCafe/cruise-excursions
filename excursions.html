@@ -364,8 +364,9 @@
 
         .excursion-option-meta {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            flex-direction: row;
+            gap: 20px;
+            align-items: center;
             font-size: 0.8em;
             margin-bottom: 8px;
         }
@@ -374,6 +375,11 @@
             font-size: 1.1em;
             font-weight: 700;
             color: #1e6f8e;
+        }
+
+        .option-activity {
+            color: #64748b;
+            font-weight: 600;
         }
 
         .option-rating {
@@ -385,6 +391,35 @@
             font-size: 0.8em;
             color: #666;
             line-height: 1.4;
+        }
+
+        /* Hide descriptions in selected items by default */
+        .selected-item-info .excursion-option-description {
+            display: none;
+        }
+
+        .selected-item-info .excursion-option-description.visible {
+            display: block;
+            margin-top: 8px;
+        }
+
+        .description-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9em;
+            color: #1e6f8e;
+            cursor: pointer;
+            margin-top: 8px;
+            user-select: none;
+        }
+
+        .description-toggle:hover {
+            opacity: 0.7;
+        }
+
+        .description-toggle-icon {
+            font-size: 1.1em;
         }
 
         .option-link {
@@ -1235,11 +1270,30 @@
                 const ratingDisplay = item.rating ? `⭐ ${item.rating}/5` : 'New';
                 const typeBadge = item.type === 'local' ? '🏝️ Local' : '⛴️ Ship';
                 const typeBadgeClass = item.type === 'local' ? 'local' : 'ship';
+
+                // Find description from excursionData
+                let description = '';
+                const portData = excursionData[item.port];
+                if (portData) {
+                    if (item.type === 'local') {
+                        const exc = portData.excursions.find(e => e.localAlternative && e.localAlternative.name === item.name);
+                        description = exc?.localAlternative?.description || '';
+                    } else {
+                        const exc = portData.excursions.find(e => e.name === item.name);
+                        description = exc?.description || '';
+                    }
+                }
+
+                const toggleKey = `selected|${item.port}|${item.name}|${item.type}`;
+
                 excursionEl.innerHTML = `
                     <div class="selected-item-info">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                             <div class="selected-item-name">${item.name}</div>
                             <span class="option-badge ${typeBadgeClass}" style="font-size: 0.7em;">${typeBadge}</span>
+                            ${description ? `<div class="description-toggle" data-toggle-for="${toggleKey}" style="margin-left: auto;">
+                                <span class="description-toggle-icon">ℹ️</span>
+                            </div>` : ''}
                         </div>
                         <div class="selected-item-port">${item.port}</div>
                         <div class="selected-item-meta">
@@ -1256,6 +1310,7 @@
                                 <div class="selected-item-value">${ratingDisplay}</div>
                             </div>
                         </div>
+                        ${description ? `<div class="excursion-option-description" data-description-for="${toggleKey}">${description}</div>` : ''}
                     </div>
                     <div class="selected-item-price">${costLabel}</div>
                 `;
@@ -1320,6 +1375,7 @@
                                 <div class="excursion-option-title">${exc.name}</div>
                                 <div class="excursion-option-meta">
                                     <div class="option-price">$${exc.cost}</div>
+                                    <div class="option-activity">Level ${exc.activityLevel}</div>
                                     <div class="option-rating">${ratingDisplay}</div>
                                 </div>
                                 <div class="excursion-option-description">${exc.description}</div>
@@ -1340,6 +1396,7 @@
                                 <div class="excursion-option-title">${exc.localAlternative.name}</div>
                                 <div class="excursion-option-meta">
                                     <div class="option-price">$${exc.localAlternative.cost}</div>
+                                    <div class="option-activity">Level ${exc.activityLevel}</div>
                                     <div class="option-rating">${localRating}</div>
                                 </div>
                                 <div class="excursion-option-description">${exc.localAlternative.description}</div>
@@ -1427,6 +1484,37 @@
         document.addEventListener('change', function(e) {
             if (e.target.classList && e.target.classList.contains('option-checkbox')) {
                 handleCheckboxChange(e);
+            }
+        });
+
+        // Handle sort button clicks
+        document.addEventListener('click', function(e) {
+            if (e.target.classList && e.target.classList.contains('sort-button')) {
+                const sortMode = e.target.dataset.sort;
+                if (sortMode) {
+                    currentSortMode = sortMode;
+                    renderPorts();
+                }
+            }
+        });
+
+        // Handle description toggle clicks
+        document.addEventListener('click', function(e) {
+            const toggle = e.target.closest('.description-toggle');
+            if (toggle) {
+                const toggleKey = toggle.dataset.toggleFor;
+                if (toggleKey) {
+                    // Find the corresponding description element
+                    const descElement = document.querySelector(`[data-description-for="${toggleKey}"]`);
+                    if (descElement) {
+                        descElement.classList.toggle('visible');
+                        // Update toggle text
+                        const span = toggle.querySelector('span:not(.description-toggle-icon)');
+                        if (span) {
+                            span.textContent = descElement.classList.contains('visible') ? 'Hide' : 'Details';
+                        }
+                    }
+                }
             }
         });
 
