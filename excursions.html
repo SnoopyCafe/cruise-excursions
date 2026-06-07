@@ -844,9 +844,15 @@
         <div class="selected-section" id="selectedSection" style="margin: 0; padding: 30px 40px; background: #f0f9ff; border-radius: 0; border: 2px solid #1e6f8e;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div class="selected-header">✓ Your Selected Excursions</div>
-                <div style="text-align: right;">
-                    <div style="font-size: 0.9em; color: #666; font-weight: 600;">Selections Total</div>
-                    <div style="font-size: 1.8em; font-weight: 700; color: #1e6f8e;">$<span id="selectedTotalAmount">0</span></div>
+                <div style="display: flex; gap: 60px;">
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.9em; color: #666; font-weight: 600;">Selections Total</div>
+                        <div style="font-size: 1.8em; font-weight: 700; color: #1e6f8e;">$<span id="selectedTotalAmount">0</span></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.9em; color: #666; font-weight: 600;">Amount Saved</div>
+                        <div style="font-size: 1.8em; font-weight: 700; color: #10b981;">$<span id="amountSavedAmount">0</span></div>
+                    </div>
                 </div>
             </div>
             <div class="selected-items" id="selectedItems"></div>
@@ -1249,6 +1255,27 @@
             const selectedTotalElement = document.getElementById('selectedTotalAmount');
             if (selectedTotalElement) {
                 selectedTotalElement.textContent = total;
+            }
+
+            // Calculate amount saved from local alternatives
+            let amountSaved = 0;
+            persistentSelectedItems.forEach((itemData, key) => {
+                if (itemData.type === 'local') {
+                    // Find the savings for this local alternative
+                    const [port, name] = key.split('|');
+                    const portData = excursionData[port];
+                    if (portData) {
+                        const exc = portData.excursions.find(e => e.localAlternative && e.localAlternative.name === name);
+                        if (exc?.localAlternative?.savings) {
+                            amountSaved += exc.localAlternative.savings;
+                        }
+                    }
+                }
+            });
+
+            const amountSavedElement = document.getElementById('amountSavedAmount');
+            if (amountSavedElement) {
+                amountSavedElement.textContent = amountSaved;
             }
 
             // Update selected items display
